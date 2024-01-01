@@ -1,0 +1,16 @@
+package components
+
+import (
+	"github.com/shaxbee/butler/internal/product"
+)
+
+templ ProductMenu(products []product.Product) {
+    <table class="relative w-full border">
+    for _, cp := range product.GroupByCategory(products) {
+        <tr>
+            <th colspan="3" class="sticky top-0 p-4 bg-slate-300 text-left text-lg font-lora italic">{cp.Category}</th>
+        </tr>
+        @ProductRows(cp.Products)
+    }
+    </table>
+}

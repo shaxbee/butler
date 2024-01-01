@@ -1,4 +1,4 @@
-package shared
+package layout
 
 templ Page(title string) {
 	<!DOCTYPE html>
@@ -6,19 +6,20 @@ templ Page(title string) {
 	<head>
 		<meta charset="UTF-8"/>
 		<title>{ title }</title>
-		<link rel="icon" type="image/svg+xml" href="/dist/favicon.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1"/>
 		<meta name="robots" content="index, follow"/>
 		<meta name="revisit-after" content="7 days"/>
 		<meta name="language" content="English"/>
 		<script src="https://unpkg.com/htmx.org@1.9.2" integrity="sha384-L6OqL9pRWyyFU3+/bjdSri+iIphTN/bvYyM37tICVyOJkWZLpP2vGn6VUEXgzg6h" crossorigin="anonymous"></script>
-		<link rel="stylesheet" href="/dist/styles.css"/>
+		<link rel="stylesheet" href="/assets/styles.css"/>
 	</head>
-	<body class="h-full">
-		<section class="max-w-lg mx-auto my-2">
-			<h1 class="text-8xl font-black text-center m-0 pb-2">Todos</h1>
+	<body class="bg-slate-200 dark:bg-slate-800">
+        @Header("The Spot")
+		@Cart()
+		<div class="max-w-6xl mx-auto my-4 p-4 min-h-screen bg-slate-50 border-x-slate-200 dark:bg-slate-800 dark:border-x-slate-700 shadow-lg">
 			{ children... }
-		</section>
+		</div>
+		@Footer()
 	</body>
 	</html>
 }

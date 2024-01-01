@@ -1,9 +1,13 @@
 package pages
 
 import (
-    "github.com/shaxbee/butler/templates/shared"
+	"github.com/shaxbee/butler/templates/layout"
+	"github.com/shaxbee/butler/templates/components"
+	"github.com/shaxbee/butler/internal/product"
 )
 
-templ HomePage() {
-    @shared.Page("Home")
+templ HomePage(products []product.Product) {
+	@layout.Page("Home") {
+		@components.ProductMenu(products)
+	}
 }

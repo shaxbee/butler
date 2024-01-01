@@ -2,7 +2,7 @@ BUILD := build
 OS := $(shell uname -s)
 ARCH := $(shell uname -m)
 
-TEMPL_VERSION := v0.2.476
+TEMPL_VERSION := v0.2.501
 TEMPL_ROOT := $(BUILD)/bin/templ-$(TEMPL_VERSION)
 TEMPL := $(TEMPL_ROOT)/templ
 
@@ -21,6 +21,13 @@ ifeq ($(OS),Darwin)
 endif # OS==Darwin
 	chmod a+x $(TAILWINDCSS)
 
+WGO_VERSION := v0.5.4
+WGO_ROOT := $(BUILD)/bin/wgo-$(WGO_VERSION)
+WGO := $(WGO_ROOT)/wgo
+
+$(WGO):
+	GOBIN=$(abspath $(WGO_ROOT)) go install github.com/bokwoon95/wgo@$(WGO_VERSION)
+
 .PHONY: generate generate-templ generate-tailwindcss
 
 generate: generate-templ generate-tailwindcss
@@ -30,3 +37,10 @@ generate-templ: $(TEMPL)
 
 generate-tailwindcss: $(TAILWINDCSS)
 	$(TAILWINDCSS) -i assets/tailwind.css -o assets/dist/styles.css
+
+.PHONY: dev
+
+dev: $(WGO)
+	$(WGO) go run ./cmd/server -addr localhost:8080 :: \
+		wgo -dir templates/ -file .templ make generate
+

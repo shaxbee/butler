@@ -5,7 +5,16 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        neonderthaw: ["Neonderthaw", "cursive"],
+        lora: ["Lora", "serif"],
+        orbitron: ["Orbitron", "sans-serif"],
+      },
+      transitionProperty: {
+        'height': 'height',
+      },
+    },
   },
   plugins: [
     require('@tailwindcss/forms'),

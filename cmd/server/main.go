@@ -9,31 +9,33 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 
-	"github.com/shaxbee/butler/internal/routes"
+	"github.com/shaxbee/butler/internal/root"
 	"golang.org/x/sync/errgroup"
 )
 
 func main() {
-	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	ctx, cancel := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT)
 	defer cancel()
 
 	logger := slog.New(slog.NewJSONHandler(os.Stderr, nil))
 
 	fs := flag.NewFlagSet("server", flag.ExitOnError)
 	addr := fs.String("addr", ":8080", "listen address")
-
 	_ = fs.Parse(os.Args[1:])
 
-	routes := routes.Routes{}
+	mux := http.NewServeMux()
+	root.NewRoutes(logger).Register(mux)
 
 	errg, ctx := errgroup.WithContext(ctx)
-
-	err := setupServer(context.Background(), errg, logger, *addr, routes.Handler())
+	err := setupServer(ctx, errg, logger, *addr, mux)
 	if err != nil {
 		os.Exit(1)
 	}
+
+	logger.Info("started")
 
 	if err := errg.Wait(); err != nil {
 		os.Exit(1)

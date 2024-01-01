@@ -1,0 +1,38 @@
+package layout
+
+templ Cart() {
+    <section role="cart" class="bg-teal-600 text-white z-10 shadow-md shadow-slate-800/30">
+        <div class="max-w-6xl mx-auto">
+            <details class="relative group">
+                <summary class="absolute right-0 -top-12 h-12 px-3 z-20 rounded-t-lg bg-teal-600 flex items-center justify-center select-none">
+                    @CartIcon()
+                    <span class="inline-flex items-center justify-center w-6 h-6 bg-slate-200 rounded-full text-xs text-black">13</span>
+                </summary>
+                <table class="table-auto border-separate border-spacing-2 p-4">
+                    <tr class="text-left">
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Amount</th>
+                        <th>Total</th>
+                    </tr>
+                    <tr>
+                        <td>Product 1</td>
+                        <td class="text-right">500 THB</td>
+                        <td class="text-right">2</td>
+                        <td class="text-right">1000 THB</td>
+                    </tr>
+                    <tr>
+                        <td>Product 4</td>
+                        <td class="text-right">450 THB</td>
+                        <td class="text-right">1</td>
+                        <td class="text-right">450 THB</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"></td>
+                        <td class="text-right">1450 THB</td>
+                    </tr>
+                </table>
+            </details>
+        </div>
+    </section>
+}

@@ -1,0 +1,35 @@
+package components
+
+import (
+	"github.com/shaxbee/butler/internal/product"
+)
+
+templ ProductRows(products []product.Product) {
+	for _, p := range products {
+		<tr class="p-2">
+			<td class="px-5">
+				<!-- name -->
+				<p class="text-lg font-lora italic">{ p.Name }</p>
+			</td>
+			<!-- description -->
+			<td>
+				<p class="text-md font-lora italic text-gray-700">{ p.Description }</p>
+			</td>
+			<td class="flex flex-row justify-end items-center space-x-2">
+				<!-- price  -->
+				if p.DiscountedPrice.IsZero() {
+					<span class="text-md font-lora italic text-black">{ p.Price.String() }</span>
+				} else {
+					<del class="text-sm font-lora italic text-gray-700">{ p.Price.String() }</del>
+					<span class="text-md font-lora italic text-black">{ p.DiscountedPrice.String() }</span>
+				}
+				<!-- add to cart -->
+				<button class="px-2 py-3 text-gray-700">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 hover:scale-125 transition duration-300">
+						<path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path>
+					</svg>
+				</button>
+			</td>
+		</tr>
+	}
+}
