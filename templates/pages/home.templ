@@ -8,6 +8,6 @@ import (
 
 templ HomePage(products []product.Product) {
 	@layout.Page("Home") {
-		@components.ProductMenu(products)
+		@components.ProductList(products)
 	}
 }
