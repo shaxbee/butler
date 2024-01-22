@@ -1,0 +1,14 @@
+version: "2"
+sql:
+  - engine: "sqlite"
+    queries: "product/repo/query.sql"
+    schema: "schema"
+    gen:
+      go:
+        package: "repo"
+        out: "product/repo"
+        overrides:
+          - column: "product.price"
+            go_type: "github.com/shopspring/decimal.Decimal"
+          - column: "product.discounted_price"
+            go_type: "github.com/shopspring/decimal.Decimal"

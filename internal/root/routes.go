@@ -9,15 +9,16 @@ import (
 	"github.com/bojanz/currency"
 
 	"github.com/shaxbee/butler/assets"
-	"github.com/shaxbee/butler/internal/product"
+	"github.com/shaxbee/butler/product"
 	"github.com/shaxbee/butler/templates/pages"
 )
 
 type Routes struct {
-	logger *slog.Logger
+	logger   *slog.Logger
+	products *product.Service
 }
 
-func NewRoutes(logger *slog.Logger) Routes {
+func NewRoutes(logger *slog.Logger, products *product.Service) Routes {
 	return Routes{
 		logger: logger.With(slog.String("component", "root")),
 	}
@@ -29,41 +30,10 @@ func (r Routes) Register(mux *http.ServeMux) {
 }
 
 func (r Routes) Home() http.Handler {
-	products := []product.Product{
-		{
-			Name:        "Product 1",
-			Category:    "Lorem",
-			Price:       thb("500"),
-			Description: "lorem, ipsum, dolor",
-		},
-		{
-			Name:            "Product 2",
-			Category:        "Lorem",
-			Price:           thb("800"),
-			DiscountedPrice: thb("600"),
-			Description:     "lorem, ipsum, dolor",
-		},
-		{
-			Name:        "Product 3",
-			Category:    "Lorem",
-			Price:       thb("700"),
-			Description: "elit, sed, do",
-		},
-		{
-			Name:            "Product 4",
-			Category:        "Ipsum",
-			Price:           thb("700"),
-			DiscountedPrice: thb("450"),
-			Description:     "amet, consectetur, adipiscing",
-		},
-		{
-			Name:        "Product 5",
-			Category:    "Ipsum",
-			Price:       thb("500"),
-			Description: "do, eiusmod, tempor",
-		},
-	}
-	return r.handler(pages.HomePage(products))
+	return http.HandlerFunc(func(rw http.ResponseWriter, req *http.Request) {
+		products, err := r.products.List(req.Context(), "THB")
+		r.handler(pages.HomePage(products, err))
+	})
 }
 
 func (r Routes) Assets() http.Handler {
@@ -76,7 +46,8 @@ func (r Routes) Assets() http.Handler {
 
 func (r Routes) handler(c templ.Component) *templ.ComponentHandler {
 	return templ.Handler(c, templ.WithErrorHandler(func(req *http.Request, err error) http.Handler {
-		r.logger.Error("render", slog.String("error", err.Error()))
+		r.logger.LogAttrs(req.Context(), slog.LevelError, "render", slog.String("error", err.Error()))
+
 		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		})

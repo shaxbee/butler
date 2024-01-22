@@ -3,11 +3,15 @@ package pages
 import (
 	"github.com/shaxbee/butler/templates/layout"
 	"github.com/shaxbee/butler/templates/components"
-	"github.com/shaxbee/butler/internal/product"
+	"github.com/shaxbee/butler/product"
 )
 
-templ HomePage(products []product.Product) {
+templ HomePage(products []product.Product, err error) {
 	@layout.Page("Home") {
-		@components.ProductList(products)
+		if err != nil {
+			@components.Error(err)
+		} else {
+			@components.ProductList(products)
+		}
 	}
 }

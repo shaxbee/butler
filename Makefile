@@ -2,7 +2,7 @@ BUILD := build
 OS := $(shell uname -s)
 ARCH := $(shell uname -m)
 
-TEMPL_VERSION := v0.2.501
+TEMPL_VERSION := v0.2.513
 TEMPL_ROOT := $(BUILD)/bin/templ-$(TEMPL_VERSION)
 TEMPL := $(TEMPL_ROOT)/templ
 
