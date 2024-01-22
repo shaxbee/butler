@@ -6,7 +6,6 @@ import (
 
 	"github.com/a-h/templ"
 	"github.com/shaxbee/butler/internal/session"
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 type Routes struct {
@@ -14,8 +13,8 @@ type Routes struct {
 }
 
 func (r Routes) Register(mux *http.ServeMux) {
-	mux.Handle("GET /cart", otelhttp.WithRouteTag("/cart", http.HandlerFunc(r.GetCart)))
-	mux.Handle("POST /cart", otelhttp.WithRouteTag("/cart", http.HandlerFunc(r.AddToCart)))
+	mux.HandleFunc("GET /cart", r.GetCart)
+	mux.HandleFunc("POST /cart", r.AddToCart)
 }
 
 func (r Routes) GetCart(rw http.ResponseWriter, req *http.Request) {
@@ -26,7 +25,6 @@ func (r Routes) GetCart(rw http.ResponseWriter, req *http.Request) {
 		http.Error(rw, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-
 }
 
 func (r Routes) AddToCart(rw http.ResponseWriter, req *http.Request) {

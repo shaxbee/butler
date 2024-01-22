@@ -22,7 +22,7 @@ func parseConfig() (Config, error) {
 	fs := flag.NewFlagSet("server", flag.ContinueOnError)
 	fs.StringSlice("config", []string{}, "config files")
 	fs.String("addr", ":8080", "listen address")
-	fs.String("db", "sqlite://local.db", "database connection string")
+	fs.String("db", "file:local.db", "database connection string")
 
 	if err := fs.Parse(os.Args[1:]); err != nil {
 		return cfg, err

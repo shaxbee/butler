@@ -1,0 +1,62 @@
+---
+version: 2
+interactions:
+    - id: 0
+      request:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        content_length: 0
+        transfer_encoding: []
+        trailer: {}
+        host: openexchangerates.org
+        remote_addr: ""
+        request_uri: ""
+        body: ""
+        form: {}
+        headers: {}
+        url: https://openexchangerates.org/api/latest.json?app_id=deadbeef&symbols=EUR%2CJPY%2CKRW%2CTHB
+        method: GET
+      response:
+        proto: HTTP/1.1
+        proto_major: 1
+        proto_minor: 1
+        transfer_encoding: []
+        trailer: {}
+        content_length: 283
+        uncompressed: false
+        body: |-
+            {
+              "disclaimer": "Usage subject to terms: https://openexchangerates.org/terms",
+              "license": "https://openexchangerates.org/license",
+              "timestamp": 1705928400,
+              "base": "USD",
+              "rates": {
+                "EUR": 0.918079,
+                "JPY": 147.78925,
+                "KRW": 1339.257269,
+                "THB": 35.6185
+              }
+            }
+        headers:
+            Access-Control-Allow-Origin:
+                - '*'
+            Cache-Control:
+                - public
+            Connection:
+                - keep-alive
+            Content-Length:
+                - "283"
+            Content-Type:
+                - application/json; charset=utf-8
+            Date:
+                - Mon, 22 Jan 2024 13:17:44 GMT
+            Etag:
+                - '"db4f4a7ea7626838321fa0c10362a9d4"'
+            Last-Modified:
+                - Mon, 22 Jan 2024 13:00:00 GMT
+            Server:
+                - nginx/1.12.2
+        status: 200 OK
+        code: 200
+        duration: 340.910458ms

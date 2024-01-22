@@ -1,4 +1,7 @@
 /build/
 /.vscode/
 
+/go.work.sum
+
 /local.db
+/example.db

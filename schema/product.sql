@@ -6,9 +6,11 @@ CREATE TABLE category (
 CREATE TABLE product (
     id INTEGER PRIMARY KEY,
     category_id INTEGER NOT NULL,
+    ordering INTEGER NOT NULL,
     name TEXT NOT NULL,
     description TEXT NOT NULL,
     price TEXT NOT NULL,
     discounted_price TEXT NOT NULL,
-    CONSTRAINT category_id_fk FOREIGN KEY (category_id) REFERENCES category(id)
+    FOREIGN KEY (category_id) REFERENCES category(id),
+    UNIQUE (category_id, ordering)
 );

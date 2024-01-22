@@ -38,9 +38,10 @@ generate-templ: $(TEMPL)
 generate-tailwindcss: $(TAILWINDCSS)
 	$(TAILWINDCSS) -i assets/tailwind.css -o assets/dist/styles.css
 
+.PHONY: migrate migrate-schema
+
 .PHONY: dev
 
-dev: $(WGO)
-	$(WGO) go run ./cmd/server -addr localhost:8080 :: \
-		wgo -dir templates/ -file .templ make generate
-
+dev: generate $(WGO)
+	$(WGO) -file 'templates/(.*).templ' -file assets/tailwind.css make generate :: \
+	wgo -file '.go' go run ./cmd/server --addr localhost:8080
