@@ -1,42 +1,42 @@
 package rate
 
-import (
-	"net/http"
-	"time"
-)
+import "net/http"
 
 type CacheBuilder struct {
+	config       CacheConfig
+	clientConfig ClientConfig
+	synthetic    string
+
 	httpClient *http.Client
-	interval   time.Duration
 	client     Client
-	config     Config
-	synthetic  string
 }
 
 func NewCacheBuilder(appID string) *CacheBuilder {
-	config := DefaultConfig.WithAppID(appID)
+	config := CacheConfig{}
+	clientConfig := ClientConfig{
+		AppID: appID,
+	}
 	return &CacheBuilder{
+		config:       config.Default(),
+		clientConfig: clientConfig.Default(),
 		httpClient: &http.Client{
 			Timeout: DefaultTimeout,
 		},
-		interval: DefaultInterval,
-		config:   config,
 	}
 }
 
-func (b *CacheBuilder) Config(config Config) *CacheBuilder {
-	b.config = config.Normalize()
+func (b *CacheBuilder) ClientConfig(config ClientConfig) *CacheBuilder {
+	b.clientConfig = config.Default()
+	return b
+}
+
+func (b *CacheBuilder) Symbols(symbols ...string) *CacheBuilder {
+	b.config.Symbols = append(b.config.Symbols, symbols...)
 	return b
 }
 
 func (b *CacheBuilder) Synthetic(base string) *CacheBuilder {
 	b.synthetic = base
-	b.config.WithSymbols(base)
-	return b
-}
-
-func (b *CacheBuilder) Interval(interval time.Duration) *CacheBuilder {
-	b.interval = interval
 	return b
 }
 
@@ -45,19 +45,14 @@ func (b *CacheBuilder) HTTPClient(httpClient *http.Client) *CacheBuilder {
 	return b
 }
 
-func (b *CacheBuilder) Client(client Client) *CacheBuilder {
-	b.client = client
-	return b
-}
-
 func (b *CacheBuilder) Build() *Cache {
 	if b.client == nil {
-		b.client = NewRestClient(b.httpClient, b.config)
+		b.client = NewRestClient(b.httpClient, b.clientConfig)
 	}
 
 	if b.synthetic != "" && b.config.Base != b.synthetic {
 		b.client = NewSyntheticClient(b.client, b.synthetic)
 	}
 
-	return NewCache(b.client, b.interval)
+	return NewCache(b.client, b.config)
 }

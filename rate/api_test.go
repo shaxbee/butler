@@ -4,7 +4,6 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/bojanz/currency"
 	"github.com/shopspring/decimal"
 )
 
@@ -14,7 +13,7 @@ var (
 	_ Client = (*SyntheticClient)(nil)
 )
 
-func verifyLatest(t testing.TB, base string, symbols []string, latest *Latest) {
+func verifyLatest(t testing.TB, base string, symbols []string, latest *LatestResponse) {
 	t.Helper()
 
 	if latest == nil {
@@ -54,7 +53,7 @@ func verifyRates(t testing.TB, symbols []string, rates map[string]decimal.Decima
 	}
 }
 
-func mustConvert(t testing.TB, latest *Latest, amount currency.Amount, symbol string) currency.Amount {
+func mustConvert(t testing.TB, latest *LatestResponse, amount decimal.Decimal, symbol string) decimal.Decimal {
 	t.Helper()
 
 	converted, err := latest.Convert(amount, symbol)
@@ -71,14 +70,6 @@ func dec(s string) decimal.Decimal {
 		panic(err)
 	}
 	return d
-}
-
-func amount(n string, symbol string) currency.Amount {
-	a, err := currency.NewAmount(n, symbol)
-	if err != nil {
-		panic(err)
-	}
-	return a
 }
 
 func parseURL(s string) *url.URL {

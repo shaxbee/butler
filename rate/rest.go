@@ -6,46 +6,52 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
 type RestClient struct {
 	httpClient *http.Client
-	config     Config
-	symbols    string
+	config     ClientConfig
 }
 
-func NewRestClient(httpClient *http.Client, config Config) *RestClient {
-	config = config.Normalize()
-	symbols := strings.Join(config.Symbols, ",")
+func NewRestClient(httpClient *http.Client, config ClientConfig) *RestClient {
+	config = config.Default()
 	return &RestClient{
 		httpClient: httpClient,
 		config:     config,
-		symbols:    symbols,
 	}
 }
 
-func (c *RestClient) Base() string {
-	return c.config.Base
-}
-
-func (c *RestClient) Latest(ctx context.Context) (*Latest, error) {
+func (c *RestClient) Latest(ctx context.Context, req LatestRequest) (*LatestResponse, error) {
 	ctx, cancel := context.WithTimeout(ctx, c.config.Timeout)
 	defer cancel()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.config.Endpoint+"/api/latest.json", nil)
+	hreq, err := http.NewRequestWithContext(ctx, http.MethodGet, c.config.Endpoint+"/api/latest.json", nil)
 	if err != nil {
 		return nil, err
 	}
 
-	q := req.URL.Query()
-	q.Set("app_id", c.config.AppID)
-	if c.symbols != "" {
-		q.Set("symbols", c.symbols)
+	if req.ETag != "" {
+		hreq.Header.Set("If-None-Match", strconv.Quote(req.ETag))
 	}
-	req.URL.RawQuery = q.Encode()
 
-	resp, err := c.httpClient.Do(req)
+	if !req.Modified.IsZero() {
+		hreq.Header.Set("If-Modified-Since", req.Modified.UTC().Format(http.TimeFormat))
+	}
+
+	query := hreq.URL.Query()
+	query.Set("app_id", c.config.AppID)
+	query.Set("base", req.Base)
+	if len(req.Symbols) > 0 {
+		query.Set("symbols", strings.Join(req.Symbols, ","))
+	}
+	if req.ShowAlternative {
+		query.Set("show_alternative", "1")
+	}
+	hreq.URL.RawQuery = query.Encode()
+
+	resp, err := c.httpClient.Do(hreq)
 	if err != nil {
 		return nil, fmt.Errorf("rate: request latest: %w", err)
 	}
@@ -63,7 +69,9 @@ func (c *RestClient) Latest(ctx context.Context) (*Latest, error) {
 		}
 	}
 
-	res := &Latest{}
+	res := &LatestResponse{
+		ETag: resp.Header.Get("ETag"),
+	}
 	if err := json.Unmarshal(body, res); err != nil {
 		return nil, fmt.Errorf("rate: unmarshal response: %w", err)
 	}

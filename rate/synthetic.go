@@ -2,6 +2,7 @@ package rate
 
 import (
 	"context"
+	"slices"
 
 	"github.com/shopspring/decimal"
 )
@@ -18,25 +19,32 @@ func NewSyntheticClient(delegate Client, base string) *SyntheticClient {
 	}
 }
 
-func (c *SyntheticClient) Latest(ctx context.Context) (*Latest, error) {
-	latest, err := c.delegate.Latest(ctx)
+func (c *SyntheticClient) Latest(ctx context.Context, req LatestRequest) (*LatestResponse, error) {
+	req.Base = DefaultBase
+
+	if !slices.Contains(req.Symbols, c.base) {
+		req.Symbols = append(req.Symbols, c.base)
+	}
+
+	latest, err := c.delegate.Latest(ctx, req)
 	if err != nil {
 		return nil, err
 	}
 
-	base := decimal.NewFromInt(1).Div(latest.Rates[c.base])
+	rate := decimal.NewFromInt(1).Div(latest.Rates[c.base])
 	synthetic := map[string]decimal.Decimal{
-		DefaultBase: base,
+		DefaultBase: rate,
 	}
 	for symbol, rate := range latest.Rates {
-		if symbol == c.base {
+		if symbol == req.Base {
 			continue
 		}
 
-		synthetic[symbol] = rate.Mul(base)
+		synthetic[symbol] = rate.Mul(rate)
 	}
 
-	return &Latest{
+	return &LatestResponse{
+		ETag:       latest.ETag,
 		Disclaimer: latest.Disclaimer,
 		License:    latest.License,
 		Timestamp:  latest.Timestamp,

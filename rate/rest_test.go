@@ -5,13 +5,13 @@ import (
 	"flag"
 	"path"
 	"regexp"
-	"strings"
 	"testing"
 
-	_ "embed"
-
+	"github.com/shopspring/decimal"
 	"gopkg.in/dnaeon/go-vcr.v3/cassette"
 	"gopkg.in/dnaeon/go-vcr.v3/recorder"
+
+	_ "embed"
 )
 
 var mockAppID = "deadbeef"
@@ -24,26 +24,29 @@ func TestClient(t *testing.T) {
 	client := NewRestClient(rec.GetDefaultClient(), clientConfig())
 
 	ctx := context.Background()
-	latest, err := client.Latest(ctx)
+	latest, err := client.Latest(ctx, LatestRequest{
+		Base:    DefaultBase,
+		Symbols: symbols,
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	verifyLatest(t, client.Base(), symbols, latest)
+	verifyLatest(t, DefaultBase, symbols, latest)
 
-	usd := amount("1234", "USD")
+	usd := dec("1234")
 	if actual := mustConvert(t, latest, usd, "USD"); !actual.Equal(usd) {
 		t.Errorf("expected %s, got %s", usd, actual)
 	}
 
-	converted := make([]string, len(symbols))
-	for i, symbol := range symbols {
+	converted := make(map[string]decimal.Decimal, len(symbols))
+	for _, symbol := range symbols {
 		amount := mustConvert(t, latest, usd, symbol)
 		if amount.Equal(usd) {
 			t.Errorf("expected %s to be different from USD", symbol)
 		}
 
-		converted[i] = amount.String()
+		converted[symbol] = amount
 	}
 
 	if actual := mustConvert(t, latest, usd, "THB"); actual.Equal(usd) {
@@ -51,7 +54,7 @@ func TestClient(t *testing.T) {
 	}
 
 	ts := latest.Timestamp.Format("2006-01-02 15:04")
-	t.Logf("%s %s: %s", ts, usd.String(), strings.Join(converted, ", "))
+	t.Logf("%s %s %s: %+v", ts, usd.String(), "USD", converted)
 }
 
 func setupRecorder(t testing.TB) *recorder.Recorder {
@@ -87,9 +90,9 @@ func setupRecorder(t testing.TB) *recorder.Recorder {
 	return rec
 }
 
-func clientConfig() Config {
-	return Config{
-		AppID:   *appID,
-		Symbols: symbols,
+func clientConfig() ClientConfig {
+	config := ClientConfig{
+		AppID: *appID,
 	}
+	return config.Default()
 }

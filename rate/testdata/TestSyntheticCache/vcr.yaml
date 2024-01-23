@@ -15,7 +15,7 @@ interactions:
         body: ""
         form: {}
         headers: {}
-        url: https://openexchangerates.org/api/latest.json?app_id=deadbeef&base=USD&symbols=THB%2CKRW%2CJPY%2CEUR
+        url: https://openexchangerates.org/api/latest.json?app_id=deadbeef&base=USD&symbols=EUR%2CJPY%2CKRW%2CTHB%2CCAD
         method: GET
       response:
         proto: HTTP/1.1
@@ -23,7 +23,7 @@ interactions:
         proto_minor: 1
         transfer_encoding: []
         trailer: {}
-        content_length: 283
+        content_length: 304
         uncompressed: false
         body: |-
             {
@@ -32,6 +32,7 @@ interactions:
               "timestamp": 1706007600,
               "base": "USD",
               "rates": {
+                "CAD": 1.347624,
                 "EUR": 0.919984,
                 "JPY": 147.83957143,
                 "KRW": 1338.4975,
@@ -46,11 +47,11 @@ interactions:
             Connection:
                 - keep-alive
             Content-Length:
-                - "283"
+                - "304"
             Content-Type:
                 - application/json; charset=utf-8
             Date:
-                - Tue, 23 Jan 2024 11:53:50 GMT
+                - Tue, 23 Jan 2024 11:53:49 GMT
             Etag:
                 - '"8800ab35bb78b2db6ef7bddb4a4e98b3"'
             Last-Modified:
@@ -59,4 +60,4 @@ interactions:
                 - nginx/1.12.2
         status: 200 OK
         code: 200
-        duration: 519.35175ms
+        duration: 312.559125ms
